@@ -1,40 +1,35 @@
-import com.sun.org.apache.xpath.internal.SourceTree;
-import javafx.scene.control.Alert;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.io.Writer;
 import java.security.InvalidParameterException;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public class XOR {
 
-    // Алфавит
-    public static String alphabet = "абвгдежзийклмнопрстуфхцчшщъыьэюя .,!?0123456789abcdefghijklmnopr";
+    public static String alphabet = "абвгдежзийклмнопрстуфхцчшщъыьэюя .,!?0123456789<>|/@#$%^&*()_-+=";
     public static int deep = 31 - Integer.numberOfLeadingZeros(alphabet.length());
 
     public static void main(String[] args) throws FileNotFoundException {
-        // Организация считывания и записи данных
-        Scanner keyScanner = new Scanner(new File("key.txt"));
         Scanner scanner = new Scanner(new File("input.txt"));
+        Scanner scannerKey = new Scanner(new File("key.txt"));
         PrintWriter printWriter = new PrintWriter(new File("output.txt"));
 
-        // Считывание ключа и слова, превращая все буквы в строчные
         String text = "";
         String key = "";
 
-
+        //System.out.println("Введите открытый текст");
         text = scanner.nextLine().toLowerCase();
-        checkInput(text, "Открытый текст");
+        text = removeText(text);
+        //checkInput(text, "Открытый текст");
+        //System.out.println("Введите ключ");
 
-        key = keyScanner.nextLine().toLowerCase();
-        checkInput(key, "Ключ");
+        key = scannerKey.nextLine().toLowerCase();
+        checkKey(key);
         String ciphertext = "";
 
         key = chengeKeyLength(key, text);
 
-        // Шифрование/дешифрование методом Гаммирования (псевдослучайные последовательности)
         for (int i = 0; i < text.length(); i++) {
             int index = alphabet.indexOf(text.charAt(i)) ^ alphabet.indexOf(key.charAt(i));
             ciphertext += alphabet.charAt(index);
@@ -46,7 +41,9 @@ public class XOR {
         System.out.print("Криптограмма:");
         System.out.println(getBinaryRepresentation(ciphertext));
 
-        printWriter.println(ciphertext);
+        System.out.println("Криптограмма:");
+        System.out.println(ciphertext);
+       // printWriter.println(ciphertext);
         printWriter.flush();
     }
 
@@ -62,13 +59,24 @@ public class XOR {
         return result;
     }
 
-    public static void checkInput(String input, String kindOfInput) throws InvalidParameterException {
+    public static void checkKey(String input) throws InvalidParameterException {
 
         for (Character c : input.toCharArray()) {
-            if (!alphabet.contains("" + c)) {
-                throw new InvalidParameterException("Ошибка! " + kindOfInput + " содержит недопустмый символ " + c);
+            if (!alphabet.contains(""+c)) {
+                throw new InvalidParameterException("Ошибка! Ключ содержит недопустмый символ " + c);
             }
         }
+
+    }
+
+    public static String removeText(String input) throws InvalidParameterException {
+            char[] mas = input.toCharArray();
+        for (Character c : mas) {
+            if (!alphabet.contains("" + c)) {
+                input = input.replaceAll("" + c, "");
+            }
+        }
+        return input;
 
     }
 
